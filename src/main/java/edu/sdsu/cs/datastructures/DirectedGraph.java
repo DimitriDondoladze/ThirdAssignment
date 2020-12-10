@@ -1,7 +1,10 @@
 package edu.sdsu.cs.datastructures;
 
+<<<<<<< HEAD
 import java.util.Collections;
 import java.util.HashSet;
+=======
+>>>>>>> e77bf0722adf82631b6e53f5a7dea7ec9991b8ba
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,10 +37,10 @@ public class DirectedGraph<V> implements IGraph<V> {
                     startVertex.nodes.add(endVertex);
                 }
             } else {
-                throw new NullPointerException("Destination vertex is not presented");
+                throw new NoSuchElementException("Destination vertex is not presented");
             }
         } else {
-            throw new NullPointerException("Starting vertex vertex is not presented");
+            throw new NoSuchElementException("Starting vertex vertex is not presented");
         }
     }
 
@@ -48,7 +51,7 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public boolean contains(V label) {
-        return nodesMap.containsValue(label);
+        return nodesMap.containsKey(label);
     }
 
     @Override
@@ -56,12 +59,12 @@ public class DirectedGraph<V> implements IGraph<V> {
         Node node = findNodeInnodesMap(start);
 
         if (node == null)
-            return;
+            throw new NoSuchElementException("Start Node not present");
 
         boolean executionresult = node.deleteConnection(destination);
 
         if (executionresult == false)
-            throw new NullPointerException("Connection not present");
+            throw new NoSuchElementException("Connection not present");
     }
 
     @Override
