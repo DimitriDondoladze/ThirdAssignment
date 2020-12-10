@@ -28,6 +28,8 @@ public class App {
                     graph.connect(strings[0], strings[1]);
                 }
             }
+
+            System.out.println(graph.size());
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }

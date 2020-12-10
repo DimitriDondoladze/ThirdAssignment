@@ -1,9 +1,11 @@
 package edu.sdsu.cs.datastructures;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.PriorityQueue;
 import java.util.TreeMap;
 
 public class DirectedGraph<V> implements IGraph<V> {
@@ -130,7 +132,76 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public List<V> shortestPath(V start, V destination) {
-        return null;
+        Node first = findNodeInnodesMap(start);
+        Node second = findNodeInnodesMap(destination);
+        if (first == null)
+            throw new NoSuchElementException("shortestPath start does not exist");
+        if (second == null)
+            throw new NoSuchElementException("shortestPath destination does not exist");
+
+        if (!isConnected(start, destination)) {
+            System.out.println("Nodes are not connected");
+            return null;
+        }
+
+        if (first.hasConnectionToNode(destination)) {
+            LinkedList<V> path = new LinkedList<>();
+            path.add(start);
+            path.add(destination);
+            return path;
+        }
+
+        return searchForPath(start, destination);
+    }
+
+    private List<V> searchForPath(V start, V destination) {
+        Node first = findNodeInnodesMap(start);
+        Node second = findNodeInnodesMap(destination);
+
+        TreeMap<V, Node> unchecked = nodesMap;
+        LinkedList<Node> checked = new LinkedList<>();
+
+        first.shortestPath = 0;
+
+        PriorityQueue<V> priority_q = new PriorityQueue<>();
+        priority_q.add(start);
+        while (!priority_q.isEmpty()) {
+            Node present = findNodeInnodesMap(priority_q.poll());
+            if (!unchecked.containsValue(present)) {
+                continue;
+            }
+            for (Node edge : (LinkedList<Node>) present.nodes) {
+
+                int calculatedDistance = present.shortestPath + 1;
+                if (calculatedDistance < edge.shortestPath) {
+                    edge.shortestPath = calculatedDistance;
+                }
+                priority_q.add((V) edge.value);
+
+            }
+            checked.add(present);
+            unchecked.remove(present.value);
+            boolean finished = true;
+            for (Node node : unchecked.values()) {
+                if (node.shortestPath != Integer.MAX_VALUE) {
+                    finished = false;
+                }
+            }
+            if (!unchecked.containsValue(second) || finished) {
+                break;
+            }
+        }
+        LinkedList<V> result = new LinkedList<>();
+        Node last = checked.get(checked.size() - 1);
+        for (int counter = checked.size() - 1; counter > 0; counter--) {
+            if (last.shortestPath - 1 == checked.get(counter - 1).shortestPath) {
+                result.add((V) last.value);
+                last = checked.get(counter - 1);
+            }
+        }
+        result.add(start);
+        Collections.reverse(result);
+        return result;
     }
 
     public int size() {
