@@ -1,28 +1,29 @@
 package edu.sdsu.cs.datastructures;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
 public class DirectedGraph<V> implements IGraph<V> {
 
-    TreeMap<V, Node> vertices;
+    TreeMap<V, Node> nodesMap;
 
     public DirectedGraph() {
-        vertices = new TreeMap<>();
+        nodesMap = new TreeMap<>();
     }
 
     @Override
     public void add(V vertexName) {
         if (!this.contains(vertexName)) {
-            vertices.put(vertexName, new Node(vertexName));
+            nodesMap.put(vertexName, new Node(vertexName));
         }
     }
 
     @Override
     public void connect(V start, V destination) {
-        Node startVertex = findNodeInVertices(start);
-        Node endVertex = findNodeInVertices(destination);
+        Node startVertex = findNodeInnodesMap(start);
+        Node endVertex = findNodeInnodesMap(destination);
 
         if (startVertex != null) {
             if (endVertex != null) {
@@ -39,21 +40,70 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public void clear() {
-
+        nodesMap.clear();
     }
 
     @Override
     public boolean contains(V label) {
-        return false;
+        return nodesMap.containsValue(label);
     }
 
     @Override
     public void disconnect(V start, V destination) {
+        Node node = findNodeInnodesMap(start);
 
+        if (node == null)
+            return;
+
+        boolean executionresult = node.deleteConnection(destination);
+
+        if (executionresult == false)
+            throw new NullPointerException("Connection not present");
     }
 
     @Override
     public boolean isConnected(V start, V destination) {
+        Node first = findNodeInnodesMap(start);
+        Node second = findNodeInnodesMap(destination);
+
+        LinkedList<Node> tracker = new LinkedList<>();
+
+        return hasConnection((V) first.value, (V) second.value, tracker);
+    }
+
+    private boolean hasConnection(V start, V destination, LinkedList<Node> tracker) {
+        Node first = findNodeInnodesMap(start);
+        Node second = findNodeInnodesMap(destination);
+        boolean executionresult = isAtLeatsOneNull(new Node[] { first, second });
+        if (executionresult)
+            throw new NullPointerException();
+
+        for (Node node : (LinkedList<Node>) first.nodes) {
+            if (node.equals(second)) {
+                return true;
+            }
+        }
+
+        tracker.add(first);
+
+        for (Node node : (LinkedList<Node>) first.nodes) {
+            if (first.equals(node))
+                continue;
+
+            if (tracker.contains(node))
+                continue;
+
+            if (!first.equals(node))
+                if (hasConnection((V) node.value, destination, tracker))
+                    return true;
+        }
+        return false;
+    }
+
+    private boolean isAtLeatsOneNull(Node[] nodes) {
+        for (Node node : nodes)
+            if (node == null)
+                return true;
         return false;
     }
 
@@ -73,7 +123,7 @@ public class DirectedGraph<V> implements IGraph<V> {
     }
 
     public int size() {
-        return vertices.size();
+        return nodesMap.size();
     }
 
     @Override
@@ -87,13 +137,11 @@ public class DirectedGraph<V> implements IGraph<V> {
     }
 
     private void add(Node node) {
-        vertices.put((V) node.value, node);
+        nodesMap.put((V) node.value, node);
     }
 
-    private Node findNodeInVertices(V value) {
-        return vertices.containsKey(value)
-                ? vertices.get(value)
-                : null;
+    private Node findNodeInnodesMap(V value) {
+        return nodesMap.containsKey(value) ? nodesMap.get(value) : null;
     }
 
     private class Node<V> {
@@ -114,7 +162,7 @@ public class DirectedGraph<V> implements IGraph<V> {
             return false;
         }
 
-        public boolean removeNode(V nodeToBeRemoved) {
+        public boolean deleteConnection(V nodeToBeRemoved) {
             for (Node node : nodes) {
                 if (node.value.equals(nodeToBeRemoved)) {
                     nodes.remove(node);
