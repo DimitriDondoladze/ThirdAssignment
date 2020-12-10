@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import edu.sdsu.cs.datastructures.DirectedGraph;
+
 /**
  * Hello world!
  *
@@ -15,8 +17,19 @@ public class App {
         try {
             File file = new File(path);
             Scanner reader = new Scanner(file);
+            DirectedGraph<String> graph = new DirectedGraph<>();
+            while (reader.hasNextLine()) {
+                String[] strings = reader.nextLine().split(",");
+                if (strings.length == 0) {
+                    graph.add(strings[0]);
+                } else {
+                    graph.add(strings[0]);
+                    graph.add(strings[1]);
+                    graph.connect(strings[0], strings[1]);
+                }
+            }
         } catch (Exception ex) {
-
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -27,7 +40,7 @@ public class App {
             return args[0];
         } catch (Exception ex) {
             System.out.println("Due to following exception, default path will be used");
-            System.out.println(ex.getMessage());
+            System.out.println("Exception: " + ex.getMessage());
             return "layout.csv";
         }
 
