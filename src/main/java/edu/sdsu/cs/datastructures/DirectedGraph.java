@@ -121,9 +121,12 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public void remove(V vertexName) {
-        if (nodesMap.containsKey(vertexName))
+        if (nodesMap.containsKey(vertexName)) {
+            for (Node node : nodesMap.values()) {
+                node.deleteConnection(vertexName);
+            }
             nodesMap.remove(vertexName);
-        else
+        } else
             throw new NoSuchElementException("Vertex Name");
     }
 
