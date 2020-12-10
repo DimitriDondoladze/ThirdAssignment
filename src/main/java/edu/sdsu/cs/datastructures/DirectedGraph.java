@@ -3,6 +3,7 @@ package edu.sdsu.cs.datastructures;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 public class DirectedGraph<V> implements IGraph<V> {
@@ -109,12 +110,22 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public Iterable<V> neighbors(V vertexName) {
-        return null;
+        if (findNodeInnodesMap(vertexName) == null)
+            throw new NoSuchElementException("Neighbour Vertex");
+
+        LinkedList<V> neighborNodes = new LinkedList<>();
+        for (Node node : (LinkedList<Node>) findNodeInnodesMap(vertexName).nodes)
+            neighborNodes.add((V) node.value);
+
+        return neighborNodes;
     }
 
     @Override
     public void remove(V vertexName) {
-
+        if (nodesMap.containsKey(vertexName))
+            nodesMap.remove(vertexName);
+        else
+            throw new NoSuchElementException("Vertex Name");
     }
 
     @Override
@@ -128,12 +139,41 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public Iterable<V> vertices() {
-        return null;
+        LinkedList<V> labelNodes = new LinkedList<>();
+
+        for (Node node : nodesMap.values()) {
+            labelNodes.add((V) node.value);
+        }
+
+        return labelNodes;
     }
 
     @Override
     public IGraph<V> connectedGraph(V origin) {
-        return null;
+        Node originNode = findNodeInnodesMap(origin);
+        if (originNode == null)
+            throw new NoSuchElementException("Origin");
+
+        LinkedList<Node> visitedNodes = new LinkedList<>();
+        visitedNodes.add(originNode);
+        connectedGraphHelper(originNode, visitedNodes);
+
+        DirectedGraph<V> newGraph = new DirectedGraph<>();
+        for (Node edge : visitedNodes)
+            newGraph.add(edge);
+
+        return newGraph;
+    }
+
+    private LinkedList<Node> connectedGraphHelper(Node origin, LinkedList<Node> visited) {
+        for (Node node : (LinkedList<Node>) origin.nodes) {
+            if (!visited.contains(node)) {
+                connectedGraphHelper(node, visited);
+                visited.add(node);
+            }
+        }
+
+        return visited;
     }
 
     private void add(Node node) {
