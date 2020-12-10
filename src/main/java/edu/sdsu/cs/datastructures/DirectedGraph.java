@@ -1,15 +1,6 @@
 package edu.sdsu.cs.datastructures;
 
-<<<<<<< HEAD
-import java.util.Collections;
-import java.util.HashSet;
-=======
->>>>>>> e77bf0722adf82631b6e53f5a7dea7ec9991b8ba
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.PriorityQueue;
-import java.util.TreeMap;
+import java.util.*;
 
 public class DirectedGraph<V> implements IGraph<V> {
 
@@ -72,6 +63,10 @@ public class DirectedGraph<V> implements IGraph<V> {
         Node first = findNodeInnodesMap(start);
         Node second = findNodeInnodesMap(destination);
 
+        boolean executionresult = isAtLeatsOneNull(new Node[] { first, second });
+        if (executionresult)
+            throw new NoSuchElementException();
+
         LinkedList<Node> tracker = new LinkedList<>();
 
         return hasConnection((V) first.value, (V) second.value, tracker);
@@ -80,9 +75,6 @@ public class DirectedGraph<V> implements IGraph<V> {
     private boolean hasConnection(V start, V destination, LinkedList<Node> tracker) {
         Node first = findNodeInnodesMap(start);
         Node second = findNodeInnodesMap(destination);
-        boolean executionresult = isAtLeatsOneNull(new Node[] { first, second });
-        if (executionresult)
-            throw new NullPointerException();
 
         for (Node node : (LinkedList<Node>) first.nodes) {
             if (node.equals(second)) {
