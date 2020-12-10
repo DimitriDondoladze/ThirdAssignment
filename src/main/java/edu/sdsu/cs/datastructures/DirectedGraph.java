@@ -2,27 +2,28 @@ package edu.sdsu.cs.datastructures;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
 
 public class DirectedGraph<V> implements IGraph<V> {
 
-    TreeMap<V, Node> vertices;
+    TreeMap<V, Node> nodesMap;
 
     public DirectedGraph() {
-        vertices = new TreeMap<>();
+        nodesMap = new TreeMap<>();
     }
 
     @Override
     public void add(V vertexName) {
         if (!this.contains(vertexName)) {
-            vertices.put(vertexName, new Node(vertexName));
+            nodesMap.put(vertexName, new Node(vertexName));
         }
     }
 
     @Override
     public void connect(V start, V destination) {
-        Node startVertex = findNodeInVertices(start);
-        Node endVertex = findNodeInVertices(destination);
+        Node startVertex = findNodeInMap(start);
+        Node endVertex = findNodeInMap(destination);
 
         if (startVertex != null) {
             if (endVertex != null) {
@@ -59,12 +60,22 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public Iterable<V> neighbors(V vertexName) {
-        return null;
+        if (findNodeInMap(vertexName) == null)
+            throw new NoSuchElementException("Neighbour Vertex");
+
+        LinkedList<V> neighborNodes = new LinkedList<>();
+        for (Node node : (LinkedList<Node>) findNodeInMap(vertexName).nodes)
+            neighborNodes.add((V) node.value);
+
+        return neighborNodes;
     }
 
     @Override
     public void remove(V vertexName) {
-
+        if (nodesMap.containsKey(vertexName))
+            nodesMap.remove(vertexName);
+        else
+            throw new NoSuchElementException("Vertex Name");
     }
 
     @Override
@@ -73,26 +84,55 @@ public class DirectedGraph<V> implements IGraph<V> {
     }
 
     public int size() {
-        return vertices.size();
+        return nodesMap.size();
     }
 
     @Override
     public Iterable<V> vertices() {
-        return null;
+        LinkedList<V> labelNodes = new LinkedList<>();
+
+        for (Node node : nodesMap.values()) {
+            labelNodes.add((V) node.value);
+        }
+
+        return labelNodes;
     }
 
     @Override
     public IGraph<V> connectedGraph(V origin) {
-        return null;
+        Node originNode = findNodeInMap(origin);
+        if (originNode == null)
+            throw new NoSuchElementException("Origin");
+
+        LinkedList<Node> visitedNodes = new LinkedList<>();
+        visitedNodes.add(originNode);
+        connectedGraphHelper(originNode, visitedNodes);
+
+        DirectedGraph<V> newGraph = new DirectedGraph<>();
+        for (Node edge : visitedNodes)
+            newGraph.add(edge);
+
+        return newGraph;
+    }
+
+    private LinkedList<Node> connectedGraphHelper(Node origin, LinkedList<Node> visited) {
+        for (Node node : (LinkedList<Node>) origin.nodes) {
+            if (!visited.contains(node)) {
+                connectedGraphHelper(node, visited);
+                visited.add(node);
+            }
+        }
+
+        return visited;
     }
 
     private void add(Node node) {
-        vertices.put((V) node.value, node);
+        nodesMap.put((V) node.value, node);
     }
 
-    private Node findNodeInVertices(V value) {
-        return vertices.containsKey(value)
-                ? vertices.get(value)
+    private Node findNodeInMap(V value) {
+        return nodesMap.containsKey(value)
+                ? nodesMap.get(value)
                 : null;
     }
 
