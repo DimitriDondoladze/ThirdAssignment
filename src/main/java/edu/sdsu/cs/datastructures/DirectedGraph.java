@@ -14,12 +14,27 @@ public class DirectedGraph<V> implements IGraph<V> {
 
     @Override
     public void add(V vertexName) {
-
+        if (!this.contains(vertexName)) {
+            vertices.put(vertexName, new Node(vertexName));
+        }
     }
 
     @Override
     public void connect(V start, V destination) {
+        Node startVertex = findNodeInVertices(start);
+        Node endVertex = findNodeInVertices(destination);
 
+        if (startVertex != null) {
+            if (endVertex != null) {
+                if (!startVertex.hasConnectionToNode(destination)) {
+                    startVertex.nodes.add(endVertex);
+                }
+            } else {
+                throw new NullPointerException("Destination vertex is not presented");
+            }
+        } else {
+            throw new NullPointerException("Starting vertex vertex is not presented");
+        }
     }
 
     @Override
@@ -71,6 +86,16 @@ public class DirectedGraph<V> implements IGraph<V> {
         return null;
     }
 
+    private void add(Node node) {
+        vertices.put((V) node.value, node);
+    }
+
+    private Node findNodeInVertices(V value) {
+        return vertices.containsKey(value)
+                ? vertices.get(value)
+                : null;
+    }
+
     private class Node<V> {
         public V value;
         public LinkedList<Node> nodes;
@@ -99,5 +124,4 @@ public class DirectedGraph<V> implements IGraph<V> {
             return false;
         }
     }
-
 }
