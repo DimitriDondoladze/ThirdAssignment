@@ -1,14 +1,19 @@
 package edu.sdsu.cs;
 
+import edu.sdsu.cs.datastructures.DirectedGraph;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import edu.sdsu.cs.datastructures.DirectedGraph;
-
 /**
- * Hello world!
- *
+ * Authors {
+ * Zurab Kavtaradze
+ * Dimitri Dondoladze
+ * }
+ * Course: CS-310
+ * Period: Fall-2020
+ * Exercise: Programming Assignment #3
  */
 public class App {
     public static void main(String[] args) throws FileNotFoundException {
